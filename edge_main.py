@@ -28,7 +28,7 @@ if __name__ == '__main__': ###
     log(INFO,f"load the data partition for client cid {cid}")
     
     with SSHClient(hostname=VM_IP, private_key_path=VM_KEY_PATH) as ssh:
-        ssh.download_file("/root/Fleet/fleet-learning/tmp/partitions.npz", "partitions.npz")
+        ssh.download_file("/root/Fleet/oscar/fleet-learning/tmp/partitions.npz", "partitions.npz")
     partition = np.load("partitions.npz")[cid]
     
     log(INFO,'data partition loaded')
