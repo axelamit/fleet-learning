@@ -8,7 +8,7 @@ from common.static_params import *
 from common.logger import log
 from logging import INFO
 
-if __name__ == '__main__':
+if __name__ == '__main__': ###
     # use gpu on edge devices
     use_gpu()
     # Get the command-line arguments

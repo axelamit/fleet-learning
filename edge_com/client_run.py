@@ -17,11 +17,11 @@ def run(ip, cid):
     branch = Repository('.').head.shorthand
 
     channel = ssh.invoke_shell()
-    channel.send(f'cd {repo_location} && git checkout {branch} \n')
+    channel.send(f'cd {repo_location} && git checkout {branch} \n') ## 
     time.sleep(3)
     channel.send(f'cd {repo_location} && git pull \n')
     time.sleep(5)
-    channel.send(f'cd {repo_location} && nohup python3 edge_main.py {cid} > output.log 2>&1 &\n')
+    channel.send(f'cd {repo_location} && nohup python3 edge_main.py {cid} > output_test.log 2>&1 &\n')
     time.sleep(5)
     channel.close()
 

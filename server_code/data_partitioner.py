@@ -15,7 +15,7 @@ from logging import INFO
 # random.seed(2023)
 
 #load data based on cid and strategy
-def partition_train_data(strat: PartitionStrategy, no_clients: int):
+def partition_train_data(strat: PartitionStrategy, no_clients: int): ####
     version = "full"  # "mini" or "full"
     zod_frames = ZodFrames(dataset_root="/mnt/ZOD", version=version)
     training_frames_all = zod_frames.get_split(constants.TRAIN)
@@ -41,6 +41,8 @@ def partition_train_data(strat: PartitionStrategy, no_clients: int):
         np.savez('tmp/partitions.npz', **cid_partitions)
     if strat == PartitionStrategy.LOCATION:
         pass
+    
+    return cid_partitions
 
 def is_valid_frame(frame_id, ground_truth):
     return frame_id in ground_truth

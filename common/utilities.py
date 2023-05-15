@@ -179,7 +179,7 @@ def plot_metrics(axs, metrics, titles, xlabels, legends, ylim=None):
             ax.set_ylim(ylim)
 
 
-def net_instance(name):
+def net_instance(name): ####
     net = PTNet().to(DEVICE) if RUN_PRETRAINED else Net().to(DEVICE)
     log(INFO,f"🌻 Created new model - {name} 🌻")
     return net
