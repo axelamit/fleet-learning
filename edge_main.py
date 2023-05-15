@@ -50,7 +50,7 @@ if __name__ == '__main__': ###
     
     log(INFO,'upload model to server')
     with SSHClient(hostname=VM_IP, private_key_path=VM_KEY_PATH) as ssh:
-        ssh.upload_file("tmp/res"+cid+".npz", "/root/Fleet/fleet-learning/tmp/res"+cid+".npz")
+        ssh.upload_file("tmp/res"+cid+".npz", "/root/Fleet/oscar/fleet-learning/tmp/res"+cid+".npz")
 
     #remove the model
     os.remove("tmp/res"+cid+".npz")

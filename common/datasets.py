@@ -41,19 +41,19 @@ class ZODImporter:
         else:
             return get_ground_truth(self.zod_frames, frame_id).shape[0] == OUTPUT_SIZE * 3
 
-    # def load_datasets(self, num_clients: int):
-    #     transform = transforms.Compose([transforms.ToTensor(), transforms.Resize((self.img_size, self.img_size),antialias=True)])
+    def load_datasets(self, num_clients: int):
+        transform = transforms.Compose([transforms.ToTensor(), transforms.Resize((self.img_size, self.img_size),antialias=True)])
 
-    #     testset = ZodDataset(zod_frames=self.zod_frames, frames_id_set=self.validation_frames,
-    #                          stored_ground_truth=self.ground_truth, transform=transform)
+        testset = ZodDataset(zod_frames=self.zod_frames, frames_id_set=self.validation_frames,
+                             stored_ground_truth=self.ground_truth, transform=transform)
 
-    #     testloader = DataLoader(testset, batch_size=self.batch_size)
+        testloader = DataLoader(testset, batch_size=self.batch_size)
 
-    #     # """report to tensor board"""
-    #     # save_dataset_tb_plot(self.tb_path, lengths_train, "training", seed)
-    #     # save_dataset_tb_plot(self.tb_path, lengths_val, "validation", seed)
+        # """report to tensor board"""
+        # save_dataset_tb_plot(self.tb_path, lengths_train, "training", seed)
+        # save_dataset_tb_plot(self.tb_path, lengths_val, "validation", seed)
 
-    #     return testloader
+        return testloader
 
 
 class ZodDataset(Dataset):
