@@ -18,8 +18,8 @@ VM_KEY_PATH = '/home/nvidia/.ssh/id_rsa'
 
 DEVICE_DICT = {
             #"agx4.nodes.edgelab.network" : 0, NOT WORKING ATM, fix it!! (flush and reinstall)
-            "agx6.nodes.edgelab.network": 0,
-            # "agx9.nodes.edgelab.network": 0,
+            # "agx6.nodes.edgelab.network": 0,
+            "agx9.nodes.edgelab.network": 0,
             # "agx10.nodes.edgelab.network": 0,
             # "orin1.nodes.edgelab.network": 0,
             # "orin2.nodes.edgelab.network": 0
@@ -27,15 +27,15 @@ DEVICE_DICT = {
 
 TARGET_DISTANCES = [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 95, 110, 125, 145, 165]
 NUM_CLIENTS = 1 #5
-PERCENTAGE_OF_DATA = 0.05 #0.02
+PERCENTAGE_OF_DATA = 0.001 #0.02
 NUM_OUTPUT = 51
 # IMG_SIZE = 224
-IMG_SIZE = 64
+IMG_SIZE = 256/2
 # IMG_SIZE = 16
 RUN_PRETRAINED = False
 BATCH_SIZE = 8
 VAL_FACTOR = 0.1 # percentage of train data on edge node to use for validation
-SUBSET_FACTOR = 0.5 # 0.003 # subset of test frames to use
+SUBSET_FACTOR = 0.003 # 0.003 # subset of test frames to use
 USE_GPU = False
 # NUM_GLOBAL_ROUNDS = 3
 NUM_GLOBAL_ROUNDS = 1
