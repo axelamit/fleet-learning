@@ -17,7 +17,7 @@ if __name__ == '__main__': ###
     log(INFO,'download current model from server')
     
     with SSHClient(hostname=VM_IP, private_key_path=VM_KEY_PATH) as ssh:
-        ssh.download_file("/root/Fleet/fleet-learning/tmp/agg.npz", "agg.npz")
+        ssh.download_file("/root/Fleet/oscar/fleet-learning/tmp/agg.npz", "agg.npz")
     parameters = list(np.load("agg.npz",allow_pickle = True)['arr_0'])
     os.remove("agg.npz")
     model = net_instance(f"{cid}")
