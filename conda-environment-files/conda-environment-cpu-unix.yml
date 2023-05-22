@@ -6,6 +6,7 @@ dependencies:
 - python=3.9
 - pytorch=1.12.1
 - torchvision=0.13
+# - torchsummary
 - cpuonly
 - pip
 - numpy
@@ -19,6 +20,8 @@ dependencies:
 - h5py
 - spacy
 - unidecode
+- pytest
+- pytest-mock
 - pip:
   - pygit2
   - paramiko
@@ -37,7 +40,8 @@ dependencies:
   - opencv-python
   - dropbox==11.36.0
   - typer~=0.7.0
-  - pyproj==3
+  # - pyproj==3
+  - pyproj
   - plotly==5.11.0
   - ipykernel>=5
   - zod[cli]==0.1.8
@@ -51,4 +55,5 @@ dependencies:
   - numba
   - networkx
   - Flask
+  - torch-summary
   

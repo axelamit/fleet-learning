@@ -18,6 +18,7 @@ class EdgeCom:
         parameters = self.__recieve(cid)
         # remove the model after fetch
         self.__remove(cid)
+        print(parameters)
         return parameters
 
     def __train(self, cid: str):
@@ -42,5 +43,5 @@ class EdgeCom:
     def __remove(self, cid: str):
         self.edge_handler.job_done(self.node)
         self.node = None
-        # os.remove("tmp/res"+cid+".npz")
+        os.remove("tmp/res"+cid+".npz")
         log(INFO,'client file removed')
