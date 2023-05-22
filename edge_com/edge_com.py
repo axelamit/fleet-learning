@@ -18,7 +18,7 @@ class EdgeCom:
         parameters = self.__recieve(cid)
         # remove the model after fetch
         self.__remove(cid)
-        print(parameters.shape)
+        print(np.shape(parameters))
         return parameters
 
     def __train(self, cid: str):
