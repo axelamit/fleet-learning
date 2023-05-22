@@ -41,9 +41,9 @@ def change_static_params():
 def mocked_edge_node_training(mocker):
     model = net_instance("mocked_model")
     params = get_parameters(model)
-    mocked_parameters = list(np.array(params, dtype=object)['arr_0'])
+    mocked_parameters = list(np.array(params, dtype=object)) #['arr_0'])
     # mocked_parameters = list(np.load("test/integration/parameters.npz", allow_pickle=True)['arr_0'])
-    mocker.patch("edge_com.edge_com.update_model", return_value=mocked_parameters)
+    mocker.patch("edge_com.edge_com.EdgeCom.update_model", return_value=mocked_parameters)
 
 
 def test_pipeline_agx(caplog, mocker, mocked_edge_node_training):
