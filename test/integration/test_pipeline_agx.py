@@ -35,8 +35,7 @@ def change_static_params():
     SUBSET_FACTOR = 0.001 # 0.003 # subset of test frames to use
 
 
-
-#TODO: mock edge_com.update_model
+# TODO: mock edge_com.update_model
 # TODO: fixture for "parameters"
 @pytest.fixture()
 def mocked_edge_node_training(mocker):
@@ -47,8 +46,7 @@ def mocked_edge_node_training(mocker):
     mocker.patch("edge_com.edge_com.update_model", return_value=mocked_parameters)
 
 
-# def test_pipeline_agx(caplog, mocker, mocked_edge_node_training):
-def test_pipeline_agx(caplog, mocker):
+def test_pipeline_agx(caplog, mocker, mocked_edge_node_training):
     ROOT = str(pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent.parent)
 
     # delete old files if present
@@ -58,22 +56,21 @@ def test_pipeline_agx(caplog, mocker):
 
     # change settings
     # change_static_params()
-    
-    logging.getLogger(__name__)
-    
-    # mocker.patch("main.ZODImporter", return_value=2)
 
+    logging.getLogger(__name__)
+
+    # mocker.patch("main.ZODImporter", return_value=2)
     server_main.main()
-    
+
     # change_back_static_params()
-    
+
     # TODO: assert these npz files are stored in server
     # TODO: assert dimenions of these files
 
-    # tmp_dir = os.listdir(os.path.join(ROOT, "tmp"))
-    # assert "agg.npz" in os.listdir(tmp_dir)
-    # assert "partitions.npz" in os.listdir(tmp_dir)
-    
+    tmp_dir = os.path.join(ROOT, "tmp")
+    assert "agg.npz" in os.listdir(tmp_dir)
+    assert "partitions.npz" in os.listdir(tmp_dir)
+
     assert True
     assert "Ray initialized" in caplog.text
 
