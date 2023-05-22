@@ -13,9 +13,9 @@ import shutil
 import pytest
 import logging
 import numpy as np
-
-
 from typing import List
+
+from common.utilities import net_instance, get_parameters
 import main as server_main
 
 
@@ -40,7 +40,10 @@ def change_static_params():
 # TODO: fixture for "parameters"
 @pytest.fixture()
 def mocked_edge_node_training(mocker):
-    mocked_parameters = list(np.load("test/integration/parameters.npz", allow_pickle=True)['arr_0'])
+    model = net_instance("mocked_model")
+    params = get_parameters(model)
+    mocked_parameters = list(np.array(params, dtype=object)['arr_0'])
+    # mocked_parameters = list(np.load("test/integration/parameters.npz", allow_pickle=True)['arr_0'])
     mocker.patch("edge_com.edge_com.update_model", return_value=mocked_parameters)
 
 
