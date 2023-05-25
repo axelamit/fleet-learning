@@ -40,8 +40,8 @@ class GlobalConfigs:
         self.VAL_FACTOR = 0.1 # percentage of train data to use for validation
         self.SUBSET_FACTOR = 0.003 # subset of test frames to use
         self.USE_GPU = False
-        self.NUM_GLOBAL_ROUNDS = 3
-        self.NUM_LOCAL_EPOCHS = 4
+        self.NUM_GLOBAL_ROUNDS = 1 # 3
+        self.NUM_LOCAL_EPOCHS = 1 # 4
         self.PRINT_DEBUG_DATA = True
         self.ML_TASK = TASK.REGRESSION
         self.OUTPUT_SIZE = 66
