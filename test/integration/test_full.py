@@ -4,47 +4,15 @@ Pipeline test.
 
 import os
 import pathlib
-import pytest
 import logging
-import ray
+from common.static_params import global_configs
 
 import main as server_main
-
-
-@pytest.fixture()
-def ray_args(static_params):
-    return {
-        "local_mode": True,
-        "ignore_reinit_error": True,
-        "include_dashboard": False,
-        "object_store_memory": 1024 * 1024 * 1024/(static_params["NUM_CLIENTS"]*1.2),
-        "num_cpus": 4,
-    }
-
-
-
-@pytest.fixture()
-def static_params():
-    return {
-        "DEVICE_DICT": {"dummy_device_1": 0},
-        "NUM_CLIENTS": 1,
-        "PERCENTAGE_OF_DATA": 0.001,
-        "IMG_SIZE": 224, # 256,
-        "RUN_PRETRAINED": False,
-        "BATCH_SIZE": 8,
-        "VAL_FACTOR": 0.1,
-        "SUBSET_FACTOR": 0.003,
-        "NUM_GLOBAL_ROUNDS": 1,
-        "NUM_LOCAL_EPOCHS": 1,
-        "OUTPUT_SIZE": 66,
-    }
 
 
 def test_pipeline(
     caplog,
     mocker,
-    ray_args,
-    static_params
 ):
     logging.getLogger(__name__)
 
@@ -55,19 +23,6 @@ def test_pipeline(
         if file.split(".")[-1] == "npz" and file.split(".")[0] != "res0":
             os.remove(os.path.join(ROOT, "tmp", file))
 
-    # change static params
-    for key, value in static_params.items():
-        mocker.patch(f"main.global_configs.{key}", return_value=value)
-        mocker.patch(f"edge_main.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.datasets.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.groundtruth_utils.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.models.global_configs.{key}", return_value=value)
-        mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
-        mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
-
-    # turn on ray local mode
-    mocker.patch("main.ray.init", return_value=ray.init(**ray_args))
-
     # run main script
     server_main.main()
 
@@ -77,9 +32,9 @@ def test_pipeline(
 
     # assert info log contains
     assert "Ray initialized" in caplog.text
-    assert "fit_round 1: strategy sampled 1 clients (out of 1)" in caplog.text
+    assert f"fit_round 1: strategy sampled {global_configs.NUM_CLIENTS} clients (out of {global_configs.NUM_CLIENTS})" in caplog.text
     assert "fit_round 1 received 1 results and 0 failures" in caplog.text
-    assert "evaluate_round 1: strategy sampled 1 clients (out of 1)" in caplog.text
+    assert f"evaluate_round 1: strategy sampled {global_configs.NUM_CLIENTS} clients (out of {global_configs.NUM_CLIENTS})" in caplog.text
     assert "evaluate_round 1 received 1 results and 0 failures" in caplog.text
     assert "FL finished" in caplog.text
 
