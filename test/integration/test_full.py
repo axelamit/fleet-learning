@@ -12,15 +12,15 @@ import main as server_main
 
 
 @pytest.fixture()
-def ray_args():
-    n_clients = 1
+def ray_args(static_params):
     return {
-        "local_mode": False,
+        "local_mode": True,
         "ignore_reinit_error": True,
         "include_dashboard": False,
-        "object_store_memory": 1024 * 1024 * 1024/(n_clients*1.2),
+        "object_store_memory": 1024 * 1024 * 1024/(static_params["NUM_CLIENTS"]*1.2),
         "num_cpus": 4,
     }
+
 
 
 @pytest.fixture()
@@ -57,7 +57,13 @@ def test_pipeline(
 
     # change static params
     for key, value in static_params.items():
-        mocker.patch(f"common.static_params.{key}", return_value=value)
+        mocker.patch(f"main.global_configs.{key}", return_value=value)
+        mocker.patch(f"edge_main.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.datasets.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.groundtruth_utils.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.models.global_configs.{key}", return_value=value)
+        mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
+        mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
 
     # turn on ray local mode
     mocker.patch("main.ray.init", return_value=ray.init(**ray_args))

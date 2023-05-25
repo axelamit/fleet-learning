@@ -19,7 +19,13 @@ def static_params():
 def test_dataloader(mocker, static_params):
     # change static params
     for key, value in static_params.items():
-        mocker.patch(f"common.static_params.{key}", return_value=value)
+        mocker.patch(f"main.global_configs.{key}", return_value=value)
+        mocker.patch(f"edge_main.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.datasets.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.groundtruth_utils.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.models.global_configs.{key}", return_value=value)
+        mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
+        mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
 
 
     # partition data among clients
