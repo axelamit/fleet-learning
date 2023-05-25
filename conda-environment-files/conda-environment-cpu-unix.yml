@@ -9,12 +9,12 @@ dependencies:
 - cpuonly
 - pip
 - numpy
-- jupyter
+#- jupyter
 - matplotlib
 - scikit-learn
 - scipy
 - pandas
-- seaborn
+#- seaborn
 - nltk
 - h5py
 - spacy
@@ -28,7 +28,7 @@ dependencies:
   - gym
   - pillow
   - kaggle
-  - ipywidgets
+#  - ipywidgets
   - tqdm>=4.60
   - pyquaternion>=0.9
   - numpy-quaternion~=2022.4.2
@@ -38,17 +38,17 @@ dependencies:
   - dropbox==11.36.0
   - typer~=0.7.0
   - pyproj==3
-  - plotly==5.11.0
+#  - plotly==5.11.0
   - ipykernel>=5
   - zod[cli]==0.1.8
   - imageio
   - timezonefinder
   - flwr[simulation]
   - pyyaml
-  - psycopg2
+#  - psycopg2
   - sqlparse
   - tqdm
   - numba
-  - networkx
-  - Flask
+#  - networkx
+#  - Flask
   
