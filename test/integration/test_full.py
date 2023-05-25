@@ -8,8 +8,9 @@ clients.
 import os
 import pathlib
 import logging
-from common.static_params import global_configs
+import numpy as np
 
+from common.static_params import global_configs
 import main as server_main
 
 
@@ -32,6 +33,12 @@ def test_pipeline(
     # assert results are retrieved by server
     assert "agg.npz" in os.listdir(tmp_dir)
     assert "partitions.npz" in os.listdir(tmp_dir)
+
+    partition = np.load("partitions.npz")[0]
+    parameters = np.load("agg.npz", allow_pickle=True)['arr_0']
+
+    print(partition.shape)
+    print(parameters.shape)
 
     # assert info log contains
     assert "Ray initialized" in caplog.text

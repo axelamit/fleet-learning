@@ -12,7 +12,8 @@ def static_params():
         "IMG_SIZE": 224,  # 256
         "BATCH_SIZE": 8,
         "OUTPUT_SIZE": 66,
-        "NUM_OUTPUT": 51
+        "NUM_OUTPUT": 51,
+        "NUM_CLIENTS": 1000,
     }
 
 
@@ -27,9 +28,8 @@ def test_dataloader(mocker, static_params):
         mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
         mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
 
-
     # partition data among clients
-    n_clients = 1000
+    n_clients = static_params["NUM_CLIENTS"]
     partitions = partition_train_data(PartitionStrategy.RANDOM, n_clients)
     log(INFO, partitions['0'][:5])
     log(INFO, partitions['1'][:5])

@@ -7,11 +7,11 @@ import pathlib
 import pytest
 import logging
 import numpy as np
-from flwr.common import FitRes, Status, Code, ndarrays_to_parameters, EvaluateRes
-import ray
 
+from common.static_params import PartitionStrategy
 from common.utilities import net_instance, get_parameters
-import main as server_main
+from server_code.data_partitioner import partition_train_data
+import edge_main as client_main
 
 
 @pytest.fixture()
@@ -31,17 +31,55 @@ def static_params():
     }
 
 
+@pytest.fixture()
+def partitions(static_params):
+    n_clients = static_params["NUM_CLIENTS"]
+    return partition_train_data(PartitionStrategy.RANDOM, n_clients)
+
+
+@pytest.fixture()
+def agg():
+    server_model = net_instance(f"server")
+    return get_parameters(server_model)
+
+
 def test_pipeline_client(
     caplog,
     mocker,
-    static_params
+    static_params,
+    partitions,
+    agg,
 ):
     logging.getLogger(__name__)
 
     # delete old files if present
     ROOT = str(pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent.parent)
     tmp_dir = os.path.join(ROOT, "tmp")
-    assert True
+
+    for file in os.listdir(tmp_dir):
+        if file == "res0.npz":
+            os.remove(os.path.join(ROOT, "tmp", file))
+
+    # mock SSH connection
+    mocker.patch("edge_main.SSHClient")
+
+    # mock file system operations
+    mocker.patch("edge_main.os.remove")
+
+    # mock reading agg.npz file
+    mocker.patch("edge_main.list", return_value=agg)
+
+    # mock reading partitions.npz file
+    mocker.patch("edge_main.np.load", return_value=partitions)
+
+    client_main()
+
+    assert "res0.npz" in os.listdir(tmp_dir)
+    parameters = np.load(os.path.join(tmp_dir, "res0.npz"), allow_pickle=True)['arr_0']
+    print(parameters.shape)
+
+    os.remove(os.path.join(tmp_dir, "res0.npz"))
+    assert "done" in caplog.text
 
 
 def main():
