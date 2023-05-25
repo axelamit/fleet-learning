@@ -1,5 +1,8 @@
 """
-Pipeline test.
+Pipeline test off complete FL session with real AGX nodes and no mocking.
+
+Please note that all changes need to be pushed to git in order to be applicable for
+clients.
 """
 
 import os

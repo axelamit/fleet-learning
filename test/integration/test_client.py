@@ -1,5 +1,5 @@
 """
-Pipeline test.
+Pipeline test of client side, with server side mocked.
 """
 
 import os
