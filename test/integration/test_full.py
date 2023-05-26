@@ -34,11 +34,8 @@ def test_pipeline(
     assert "agg.npz" in os.listdir(tmp_dir)
     assert "partitions.npz" in os.listdir(tmp_dir)
 
-    partition = np.load("partitions.npz")[0]
-    parameters = np.load("agg.npz", allow_pickle=True)['arr_0']
-
-    print(partition.shape)
-    print(parameters.shape)
+    np.load(os.path.join(tmp_dir, "partitions.npz"))["0"]
+    np.load(os.path.join(tmp_dir, "agg.npz"), allow_pickle=True)['arr_0']
 
     # assert info log contains
     assert "Ray initialized" in caplog.text
