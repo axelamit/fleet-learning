@@ -38,12 +38,19 @@ def test_pipeline(
     np.load(os.path.join(tmp_dir, "agg.npz"), allow_pickle=True)['arr_0']
 
     # assert info log contains
-    assert "Ray initialized" in caplog.text
-    assert f"fit_round 1: strategy sampled {global_configs.NUM_CLIENTS} clients (out of {global_configs.NUM_CLIENTS})" in caplog.text
-    assert "fit_round 1 received 1 results and 0 failures" in caplog.text
-    assert f"evaluate_round 1: strategy sampled {global_configs.NUM_CLIENTS} clients (out of {global_configs.NUM_CLIENTS})" in caplog.text
-    assert "evaluate_round 1 received 1 results and 0 failures" in caplog.text
-    assert "FL finished" in caplog.text
+    n_clients = global_configs.NUM_CLIENTS
+
+    log_contents = [
+        "Ray initialized",
+        f"fit_round 1: strategy sampled {n_clients} clients (out of {n_clients})",
+        f"fit_round 1 received {n_clients} results and 0 failures",
+        f"evaluate_round 1: strategy sampled {n_clients} clients (out of {n_clients})",
+        f"evaluate_round 1 received 0 results and {n_clients} failures",
+        "FL finished",
+    ]
+
+    for log_content in log_contents:
+        assert log_content in caplog.text
 
 
 def main():
