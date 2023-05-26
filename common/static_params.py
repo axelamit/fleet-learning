@@ -34,7 +34,7 @@ class GlobalConfigs:
         self.NUM_CLIENTS = 2 # 5
         self.PERCENTAGE_OF_DATA = 0.02
         self.NUM_OUTPUT = 51
-        self.IMG_SIZE = 224 # 256
+        self.IMG_SIZE = 256
         self.RUN_PRETRAINED = False
         self.BATCH_SIZE = 8
         self.VAL_FACTOR = 0.1 # percentage of train data to use for validation
