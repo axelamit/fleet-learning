@@ -1,7 +1,7 @@
 FROM continuumio/miniconda3
 
 # Site package update
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y && apt-get install libgl1 -y
 
 WORKDIR /root/Fleet
 
