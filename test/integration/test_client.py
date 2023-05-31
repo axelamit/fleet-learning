@@ -17,7 +17,7 @@ import edge_main
 def static_params():
     return {
         "DEVICE_DICT": {"dummy_device_1": 0},
-        "NUM_CLIENTS": 1,
+        "NUM_CLIENTS": 1000,
         "PERCENTAGE_OF_DATA": 0.001,
         "IMG_SIZE": 224, #256,
         "RUN_PRETRAINED": False,
@@ -50,8 +50,6 @@ def test_pipeline_client(
     agg,
 ):
     logging.getLogger(__name__)
-    
-    client_id = 0
 
     # delete old files if present
     ROOT = str(pathlib.Path(os.path.dirname(os.path.realpath(__file__))).parent.parent)
@@ -61,11 +59,11 @@ def test_pipeline_client(
         if file == "res0.npz":
             os.remove(os.path.join(ROOT, "tmp", file))
 
-    testargs = ["0", "0", "0"]
+    testargs = [None, "0"]
     mocker.patch.object(edge_main.sys, 'argv', testargs)
 
     # mock GPU usage
-    # mocker.patch("edge_main.use_gpu")
+    mocker.patch("edge_main.use_gpu")
 
     # mock SSH connection
     mocker.patch("edge_main.SSHClient")
@@ -83,7 +81,7 @@ def test_pipeline_client(
 
     assert "res0.npz" in os.listdir(tmp_dir)
     mocker.stopall()
-    parameters = np.load(os.path.join(tmp_dir, "res0.npz"), allow_pickle=True)["arr_0"]
+    np.load(os.path.join(tmp_dir, "res0.npz"), allow_pickle=True)["arr_0"]
 
     # os.remove(os.path.join(tmp_dir, "res0.npz"))
     assert "done" in caplog.text
