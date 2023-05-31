@@ -10,12 +10,39 @@ import numpy as np
 from flwr.common import FitRes, Status, Code, ndarrays_to_parameters, EvaluateRes
 import ray
 
-from common.utilities import net_instance, get_parameters
-import main as server_main
 
+@pytest.fixture(autouse=True)
+def mock_static_params(mocker):
+    mocked_global_config_dict = {
+        "DEVICE_DICT": {"dummy_device_1": 0},
+        "NUM_CLIENTS": 2,
+        "PERCENTAGE_OF_DATA": 0.02,
+        "IMG_SIZE": 256,
+        "RUN_PRETRAINED": False,
+        "BATCH_SIZE": 8,
+        "VAL_FACTOR": 0.1,
+        "SUBSET_FACTOR": 0.003,
+        "NUM_GLOBAL_ROUNDS": 1,
+        "NUM_LOCAL_EPOCHS": 1,
+        "OUTPUT_SIZE": 66,
+    }
+
+    for key, value in mocked_global_config_dict.items():
+        mocker.patch(f"common.datasets.global_configs.{key}", return_value=value)
+        mocker.patch(f"main.global_configs.{key}", return_value=value)
+        mocker.patch(f"edge_main.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.groundtruth_utils.global_configs.{key}", return_value=value)
+        mocker.patch(f"common.models.global_configs.{key}", return_value=value)
+        mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
+        mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
+        print("hej1")
+
+    return mocked_global_config_dict
 
 @pytest.fixture()
 def model_parameters():
+    print("hej2")
+    from common.utilities import net_instance, get_parameters
     model = net_instance("1")
     params = get_parameters(model)
     params = list(np.array(params, dtype=object))
@@ -43,30 +70,15 @@ def eval_res():
 
 
 @pytest.fixture()
-def ray_args(static_params):
+def ray_args(mock_static_params):
     return {
         "local_mode": True,
         "ignore_reinit_error": True,
         "include_dashboard": False,
-        "object_store_memory": 1024 * 1024 * 1024/(static_params["NUM_CLIENTS"]*1.2),
+        "object_store_memory": 1024 * 1024 * 1024 / (
+            mock_static_params["NUM_CLIENTS"]*1.2
+        ),
         "num_cpus": 4,
-    }
-
-
-@pytest.fixture()
-def static_params():
-    return {
-        "DEVICE_DICT": {"dummy_device_1": 0},
-        "NUM_CLIENTS": 1,
-        "PERCENTAGE_OF_DATA": 0.001,
-        "IMG_SIZE": 224, #256,
-        "RUN_PRETRAINED": False,
-        "BATCH_SIZE": 8,
-        "VAL_FACTOR": 0.1,
-        "SUBSET_FACTOR": 0.003,
-        "NUM_GLOBAL_ROUNDS": 1,
-        "NUM_LOCAL_EPOCHS": 1,
-        "OUTPUT_SIZE": 66,
     }
 
 
@@ -77,7 +89,6 @@ def test_pipeline_server(
     fit_res,
     eval_res,
     ray_args,
-    static_params
 ):
     logging.getLogger(__name__)
 
@@ -87,16 +98,6 @@ def test_pipeline_server(
     for file in os.listdir(tmp_dir):
         if file.split(".")[-1] == "npz" and file.split(".")[0] != "res0":
             os.remove(os.path.join(ROOT, "tmp", file))
-
-    # change static params
-    for key, value in static_params.items():
-        mocker.patch(f"main.global_configs.{key}", return_value=value)
-        mocker.patch(f"edge_main.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.datasets.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.groundtruth_utils.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.models.global_configs.{key}", return_value=value)
-        mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
-        mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
 
     # turn on ray local mode
     mocker.patch("main.ray.init", return_value=ray.init(**ray_args))
@@ -110,11 +111,12 @@ def test_pipeline_server(
 
     # mock ray returns of results
     mocker.patch("server_code.ray_client_proxy_flwr.ray.get", side_effect=[
-            fit_res, eval_res
+            fit_res, fit_res, eval_res, eval_res
         ]
     )
 
     # run main script
+    import main as server_main
     server_main.main()
 
     # assert results are retrieved by server
