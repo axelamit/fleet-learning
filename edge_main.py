@@ -17,7 +17,7 @@ def main():
     fleet_log(INFO,'download current model from server')
     
     with SSHClient(hostname=global_configs.VM_IP, private_key_path=global_configs.VM_KEY_PATH) as ssh:
-        ssh.download_file(global_configs.SERVER_MAIN_PATH + "tmp/agg.npz", "aggXXXXX.npz")
+        ssh.download_file(global_configs.SERVER_MAIN_PATH + "tmp/agg.npz", "agg.npz")
     parameters = list(np.load("agg.npz",allow_pickle = True)['arr_0'])
     os.remove("agg.npz")
     model = net_instance(f"{cid}")
