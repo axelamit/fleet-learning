@@ -3,6 +3,8 @@ from edge_com.edge_com import EdgeCom
 import flwr as fl
 from common.logger import fleet_log
 from logging import INFO
+from common.static_params import global_configs
+
 
 class FlowerClient(fl.client.NumPyClient):
     def __init__(self, cid, edge_handler: EdgeHandler, tb_path=None, federated_subpath=None):

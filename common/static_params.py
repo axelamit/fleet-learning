@@ -17,6 +17,7 @@ class PartitionStrategy(Enum):
 @dataclass
 class GlobalConfigs:
     def __init__(self):
+        self.SIMULATED = True
         self.SERVER_MAIN_PATH = "/root/Fleet/fleet-learning/"
         self.VM_IP = '172.25.16.67'
         self.VM_KEY_PATH = '/home/nvidia/.ssh/id_rsa'
