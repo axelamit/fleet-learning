@@ -77,9 +77,12 @@ class FederatedStarter:
         partitions_not_to_use = 1/global_configs.PERCENTAGE_OF_DATA
         partition_train_data(PartitionStrategy.RANDOM, int(global_configs.NUM_CLIENTS*partitions_not_to_use))
 
-        # Available edge devices shared dictionary
-        shared_device_dict = global_configs.DEVICE_DICT
-        shared_dict_remote = SharedDict.remote(shared_device_dict)
+        if global_configs.SIMULATED:
+            shared_dict_remote = None
+        else:
+            # Available edge devices shared dictionary
+            shared_device_dict = global_configs.DEVICE_DICT
+            shared_dict_remote = SharedDict.remote(shared_device_dict)
 
         self.edge_handler = EdgeHandler(1, shared_dict_remote)
 

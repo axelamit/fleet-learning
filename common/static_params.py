@@ -18,6 +18,8 @@ class PartitionStrategy(Enum):
 class GlobalConfigs:
     def __init__(self):
         self.SIMULATED = True
+        self.NUM_CPUS = 3 # how many processes to allow ray to start up
+        self.GB_RAM = 6 # how many GB ram per process
         self.SERVER_MAIN_PATH = "/root/Fleet/fleet-learning/"
         self.VM_IP = '172.25.16.67'
         self.VM_KEY_PATH = '/home/nvidia/.ssh/id_rsa'
@@ -32,7 +34,7 @@ class GlobalConfigs:
                 }
 
         self.TARGET_DISTANCES = [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 95, 110, 125, 145, 165]
-        self.NUM_CLIENTS = 5
+        self.NUM_CLIENTS = 20
         self.PERCENTAGE_OF_DATA = 0.02
         self.NUM_OUTPUT = 51
         self.IMG_SIZE = 256
