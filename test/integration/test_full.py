@@ -16,7 +16,6 @@ import main as server_main
 
 def test_pipeline(
     caplog,
-    mocker,
 ):
     logging.getLogger(__name__)
 

@@ -16,7 +16,7 @@ from common.static_params import global_configs
 def mock_static_params(mocker):
     mocked_global_config_dict = {
         "DEVICE_DICT": {"dummy_device_1": 0},
-        "NUM_CLIENTS": 1,
+        "NUM_CLIENTS": 1,  # currently only works for 1 client due to local ray instance
         "PERCENTAGE_OF_DATA": 0.02,
         "IMG_SIZE": 256,
         "RUN_PRETRAINED": False,
@@ -37,7 +37,7 @@ def mock_static_params(mocker):
 @pytest.fixture()
 def model_parameters():
     from common.utilities import net_instance, get_parameters
-    model = net_instance("1")
+    model = net_instance("dummy_name")
     params = get_parameters(model)
     params = list(np.array(params, dtype=object))
     return params
@@ -63,9 +63,9 @@ def eval_res():
     )
 
 
-@pytest.fixture()
-def ray_args(mock_static_params):
-    return {
+@pytest.fixture(autouse=True)
+def mock_ray_communication(mocker, mock_static_params, fit_res, eval_res):
+    mocked_ray_args = {
         "local_mode": True,
         "ignore_reinit_error": True,
         "include_dashboard": False,
@@ -75,15 +75,23 @@ def ray_args(mock_static_params):
         "num_cpus": 4,
     }
 
+    mocker.patch("main.ray.init", return_value=ray.init(**mocked_ray_args))
+    mocker.patch("server_code.ray_client_proxy_flwr.ray.get", side_effect=[
+            fit_res, eval_res
+        ]
+    )
 
-def test_pipeline_server(
-    caplog,
-    mocker,
-    model_parameters,
-    fit_res,
-    eval_res,
-    ray_args,
-):
+
+@pytest.fixture(autouse=True)
+def mock_client_communication(mocker, model_parameters):
+    mocker.patch("server_code.clients.flwr_client.EdgeCom.__init__", return_value=None)
+    mocker.patch(
+        "server_code.clients.flwr_client.EdgeCom.update_model",
+        return_value=model_parameters
+    )
+
+
+def test_pipeline_server(caplog):
     logging.getLogger(__name__)
 
     # delete old files if present
@@ -92,22 +100,6 @@ def test_pipeline_server(
     for file in os.listdir(tmp_dir):
         if file.split(".")[-1] == "npz" and file.split(".")[0] != "res0":
             os.remove(os.path.join(ROOT, "tmp", file))
-
-    # turn on ray local mode
-    mocker.patch("main.ray.init", return_value=ray.init(**ray_args))
-
-    # mock all client communication
-    mocker.patch("server_code.clients.flwr_client.EdgeCom.__init__", return_value=None)
-    mocker.patch(
-        "server_code.clients.flwr_client.EdgeCom.update_model",
-        return_value=model_parameters
-    )
-
-    # mock ray returns of results
-    mocker.patch("server_code.ray_client_proxy_flwr.ray.get", side_effect=[
-            fit_res, eval_res
-        ]
-    )
 
     # run main script
     import main as server_main
