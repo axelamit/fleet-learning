@@ -1,7 +1,6 @@
 """
 Pipeline test of server side, with client side mocked.
 """
-
 import os
 import pathlib
 import pytest
@@ -10,12 +9,14 @@ import numpy as np
 from flwr.common import FitRes, Status, Code, ndarrays_to_parameters, EvaluateRes
 import ray
 
+from common.static_params import global_configs
+
 
 @pytest.fixture(autouse=True)
 def mock_static_params(mocker):
     mocked_global_config_dict = {
         "DEVICE_DICT": {"dummy_device_1": 0},
-        "NUM_CLIENTS": 2,
+        "NUM_CLIENTS": 1,
         "PERCENTAGE_OF_DATA": 0.02,
         "IMG_SIZE": 256,
         "RUN_PRETRAINED": False,
@@ -28,20 +29,13 @@ def mock_static_params(mocker):
     }
 
     for key, value in mocked_global_config_dict.items():
-        mocker.patch(f"common.datasets.global_configs.{key}", return_value=value)
-        mocker.patch(f"main.global_configs.{key}", return_value=value)
-        mocker.patch(f"edge_main.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.groundtruth_utils.global_configs.{key}", return_value=value)
-        mocker.patch(f"common.models.global_configs.{key}", return_value=value)
-        mocker.patch(f"edge_code.data_loader.global_configs.{key}", return_value=value)
-        mocker.patch(f"server_code.data_partitioner.global_configs.{key}", return_value=value)
-        print("hej1")
+        mocker.patch.object(global_configs, key, value)
 
     return mocked_global_config_dict
 
+
 @pytest.fixture()
 def model_parameters():
-    print("hej2")
     from common.utilities import net_instance, get_parameters
     model = net_instance("1")
     params = get_parameters(model)
@@ -111,7 +105,7 @@ def test_pipeline_server(
 
     # mock ray returns of results
     mocker.patch("server_code.ray_client_proxy_flwr.ray.get", side_effect=[
-            fit_res, fit_res, eval_res, eval_res
+            fit_res, eval_res
         ]
     )
 
@@ -123,11 +117,9 @@ def test_pipeline_server(
     assert "agg.npz" in os.listdir(tmp_dir)
     assert "partitions.npz" in os.listdir(tmp_dir)
 
-    partition = np.load("partitions.npz")[0]
-    parameters = np.load("agg.npz", allow_pickle=True)['arr_0']
-
-    print(partition.shape)
-    print(parameters.shape)
+    # assert saved files are valid numpys
+    np.load(os.path.join(ROOT, "tmp", "partitions.npz"))["0"]
+    np.load(os.path.join(ROOT, "tmp", "agg.npz"), allow_pickle=True)['arr_0']
 
     # assert info log contains
     assert "Ray initialized" in caplog.text
