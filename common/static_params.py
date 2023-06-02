@@ -20,6 +20,7 @@ class GlobalConfigs:
         self.SIMULATED = True
         self.NUM_CPUS = 3 # how many processes to allow ray to start up
         self.GB_RAM = 6 # how many GB ram per process
+        self.FRACTION_FIT = 0.25 # percentage of total clients to use in a round
         self.SERVER_MAIN_PATH = "/root/Fleet/fleet-learning/"
         self.VM_IP = '172.25.16.67'
         self.VM_KEY_PATH = '/home/nvidia/.ssh/id_rsa'
