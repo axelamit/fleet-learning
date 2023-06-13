@@ -10,6 +10,7 @@ from server_code.data_partitioner import partition_train_data
 from common.static_params import PartitionStrategy
 from common.logger import fleet_log
 from common.static_params import global_configs
+from test.utils.cleanup import cleanup_modules
 
 
 @pytest.fixture(autouse=True)
@@ -82,3 +83,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+cleanup_modules()
