@@ -1,3 +1,9 @@
+Build a local docker image
+
+```docker
+docker build -t <name_of_image> -f docker/Dockerfile .
+```
+
 Save a local docker image to `.tar`
 
 ```docker
@@ -12,5 +18,5 @@ docker load -i <path to image tar file>
 
 
 ```docker
-docker run -v /mnt/ZOD:/mnt/ZOD <image name>
+docker run -v /mnt/ZOD:/mnt/ZOD <image name> --cpus=4 -m 3GB
 ```

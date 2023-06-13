@@ -13,4 +13,4 @@ RUN conda env create -f conda-environment-files/conda-environment-cpu-unix.yml
 # Make RUN commands use the new environment:
 SHELL ["conda", "run", "-n", "fleet", "/bin/bash", "-c"]
 
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "fleet", "python", "main.py"]
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "fleet", "nohup", "python3", "main.py > outlog.log 2>&1"]
