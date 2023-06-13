@@ -3,6 +3,7 @@ Pipeline test of server side, with client side mocked.
 """
 import os
 import pathlib
+from importlib import reload
 import pytest
 import logging
 import numpy as np
@@ -10,6 +11,7 @@ from flwr.common import FitRes, Status, Code, ndarrays_to_parameters, EvaluateRe
 import ray
 
 from common.static_params import global_configs
+from test.utils.cleanup import cleanup_modules
 
 
 @pytest.fixture(autouse=True)
@@ -74,7 +76,6 @@ def mock_ray_communication(mocker, mock_static_params, fit_res, eval_res):
         ),
         "num_cpus": 4,
     }
-
     mocker.patch("main.ray.init", return_value=ray.init(**mocked_ray_args))
     mocker.patch("server_code.ray_client_proxy_flwr.ray.get", side_effect=[
             fit_res, eval_res
@@ -103,6 +104,7 @@ def test_pipeline_server(caplog):
 
     # run main script
     import main as server_main
+    reload(server_main)  # to avoid using cached non-mocked global params from test_full
     server_main.main()
 
     # assert results are retrieved by server
@@ -128,3 +130,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+cleanup_modules()

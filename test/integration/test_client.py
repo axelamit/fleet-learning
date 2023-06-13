@@ -11,6 +11,7 @@ import numpy as np
 from common.static_params import PartitionStrategy, global_configs
 from common.utilities import net_instance, get_parameters
 from server_code.data_partitioner import partition_train_data
+from test.utils.cleanup import cleanup_modules
 
 
 @pytest.fixture(autouse=True)
@@ -96,3 +97,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+cleanup_modules()
