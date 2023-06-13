@@ -11,7 +11,6 @@ from flwr.common import FitRes, Status, Code, ndarrays_to_parameters, EvaluateRe
 import ray
 
 from common.static_params import global_configs
-from test.utils.cleanup import cleanup_modules
 
 
 @pytest.fixture(autouse=True)
@@ -104,7 +103,7 @@ def test_pipeline_server(caplog):
 
     # run main script
     import main as server_main
-    reload(server_main)  # to avoid using cached non-mocked global params from test_full
+    reload(server_main)  # to avoid using cached non-mocked global params
     server_main.main()
 
     # assert results are retrieved by server
@@ -115,7 +114,7 @@ def test_pipeline_server(caplog):
     np.load(os.path.join(ROOT, "tmp", "partitions.npz"))["0"]
     np.load(os.path.join(ROOT, "tmp", "agg.npz"), allow_pickle=True)['arr_0']
 
-    # assert info log contains
+    # assert info log conent
     assert "Ray initialized" in caplog.text
     assert "fit_round 1: strategy sampled 1 clients (out of 1)" in caplog.text
     assert "fit_round 1 received 1 results and 0 failures" in caplog.text
@@ -130,5 +129,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-cleanup_modules()

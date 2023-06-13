@@ -1,7 +1,6 @@
 """
 Pipeline test of client side, with server side mocked.
 """
-
 import os
 import pathlib
 import pytest
@@ -12,6 +11,7 @@ from common.static_params import PartitionStrategy, global_configs
 from common.utilities import net_instance, get_parameters
 from server_code.data_partitioner import partition_train_data
 from test.utils.cleanup import cleanup_modules
+cleanup_modules()
 
 
 @pytest.fixture(autouse=True)
@@ -78,16 +78,16 @@ def test_pipeline_client(
     # mock GPU usage
     mocker.patch("edge_main.use_gpu")
 
+    # run main script
     import edge_main
     mocker.patch.object(edge_main.sys, 'argv', command_line_args)
     edge_main.main()
     mocker.stopall()
 
-    # assert that correct np file is created
+    # assert that correct np file is created and can be loaded
     assert "res0.npz" in os.listdir(tmp_dir)
     np.load(os.path.join(tmp_dir, "res0.npz"), allow_pickle=True)["arr_0"]
 
-    # os.remove(os.path.join(tmp_dir, "res0.npz"))
     assert "done" in caplog.text
 
 
@@ -97,6 +97,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-cleanup_modules()

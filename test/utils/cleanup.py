@@ -11,4 +11,3 @@ def cleanup_modules():
         for component in modules_to_reload:
             if component in imported_module:
                 del sys.modules[imported_module]
-                print(f"deleted module: {imported_module}")

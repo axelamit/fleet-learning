@@ -11,6 +11,7 @@ from common.static_params import PartitionStrategy
 from common.logger import fleet_log
 from common.static_params import global_configs
 from test.utils.cleanup import cleanup_modules
+cleanup_modules()
 
 
 @pytest.fixture(autouse=True)
@@ -38,6 +39,8 @@ def test_dataloader(mock_static_params):
     partitions = partition_train_data(
         PartitionStrategy.RANDOM, mock_static_params["NUM_CLIENTS"]
     )
+    assert len(partitions.keys()) == mock_static_params["NUM_CLIENTS"]
+
     fleet_log(INFO, partitions['0'][:5])
     fleet_log(INFO, partitions['1'][:5])
 
@@ -47,9 +50,7 @@ def test_dataloader(mock_static_params):
     fleet_log(INFO, train_loader)
     fleet_log(INFO, type(train_loader))
 
-    # checks
-    assert len(partitions.keys()) == mock_static_params["NUM_CLIENTS"]
-
+    # assert the dataloaders are valid
     train_data, train_targets = next(iter(train_loader))
     val_data, val_targets = next(iter(val_loader))
     test_data, test_targets = next(iter(test_loader))
@@ -62,17 +63,14 @@ def test_dataloader(mock_static_params):
             mock_static_params["IMG_SIZE"],
         ]
     )
-
     targets_shape = torch.Size(
         [mock_static_params["BATCH_SIZE"], mock_static_params["NUM_OUTPUT"]]
     )
 
     assert train_data.shape == data_shape
     assert train_targets.shape == targets_shape
-
     assert val_data.shape == data_shape
     assert val_targets.shape == targets_shape
-
     assert test_data.shape == data_shape
     assert test_targets.shape == targets_shape
 
@@ -83,5 +81,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-cleanup_modules()

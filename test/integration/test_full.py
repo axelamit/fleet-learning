@@ -13,6 +13,7 @@ import numpy as np
 import main as server_main
 from common.static_params import global_configs
 from test.utils.cleanup import cleanup_modules
+cleanup_modules()
 
 
 def test_pipeline(
@@ -37,7 +38,7 @@ def test_pipeline(
     np.load(os.path.join(tmp_dir, "partitions.npz"))["0"]
     np.load(os.path.join(tmp_dir, "agg.npz"), allow_pickle=True)['arr_0']
 
-    # assert info log contains
+    # assert info log content
     n_clients = global_configs.NUM_CLIENTS
 
     log_contents = [
@@ -59,5 +60,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-cleanup_modules()
