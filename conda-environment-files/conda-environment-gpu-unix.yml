@@ -49,7 +49,6 @@ dependencies:
   - pyyaml
   - psycopg2
   - sqlparse
-  - tqdm
   - numba
   - networkx
   - torchsummary

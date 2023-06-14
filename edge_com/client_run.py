@@ -21,7 +21,7 @@ def run(ip, cid):
     time.sleep(5)
     channel.send(f'cd {repo_location} && git reset --hard origin/{branch} \n')
     time.sleep(5)
-    channel.send(f'cd {repo_location} && nohup python3 edge_main.py {cid} > output_brask.log 2>&1 &\n')
+    channel.send(f'cd {repo_location} && nohup python3 edge_main.py {cid} > output.log 2>&1 &\n')
     time.sleep(5)
     channel.close()
 
