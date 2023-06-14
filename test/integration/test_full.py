@@ -13,7 +13,6 @@ import numpy as np
 import main as server_main
 from common.static_params import global_configs
 from test.utils.cleanup import cleanup_modules
-cleanup_modules()
 
 
 def test_pipeline(
@@ -60,3 +59,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+cleanup_modules()
