@@ -31,13 +31,14 @@ class AzureServer:
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind(self.ADDR)
         self.s.listen()
-        print(f"[SERVER] Listening on {self.SERVER_IP} port {self.PORT}")
+        print("[SERVER] Server started")
+        print(f"[SERVER] Listening on {self.SERVER_IP} port {self.PORT}\n")
 
     def _process_client_connections(self):
         self.stop_session = False
         conn, addr = self.s.accept()
         new_client = (conn, addr)
-        print("[SERVER] Connected to: ", addr[0], "port", addr[1])
+        print(f"[SERVER] Connected to client: {addr[0]} port {addr[1]}")
         self.process_client(new_client)
 
     def process_client(self, connected_client):
@@ -52,13 +53,13 @@ class AzureServer:
             data = conn.recv(self.MSG_LENGTH)
 
             if not data:
-                print("[SERVER] Connection exit.")
+                print("[SERVER] Exit connection to client.\n")
                 break
 
             self._parse_client_message(connected_client, data)
 
             if self.stop_session:
-                print("[SERVER] Connection exit.")
+                print("[SERVER] Exit connection to client.\n")
                 break
 
         conn.close()
@@ -69,16 +70,13 @@ class AzureServer:
         conn, addr = connected_client
 
         if client_message == self.message_from_client[0]:
-            time.sleep(3)
             print(f"[SERVER] Received msg from client: {client_message}")
             print("[SERVER] Scheduling task on virtual vehicle.")
-            time.sleep(3)
             conn.sendall(self.message_to_client[0].encode("utf-8"))
             print("[SERVER] Waiting for results...")
 
         elif client_message == self.message_from_client[1]:
             print("[SERVER] Received results from virtual vehicle.")
-            time.sleep(1)
             print(f"[SERVER] Ending session with client on {addr[0]}.")
             conn.sendall(self.message_to_client[1].encode("utf-8"))
             self.stop_session = True
