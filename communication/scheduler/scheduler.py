@@ -13,8 +13,8 @@ class AGX:
         self.message_to_virtual_vehicle = ["TASK_SCHEDULED", "RESULTS"]
         self.message_from_virtual_vehicle = ["HELLO", "TRAIN"]
         self.BUFFER = []
-        self.READY = True
         self.CLIENT_ID = 0
+        self.MAX_BUFFER_SIZE = 100
 
     def run_scheduler(self):
         self.print_lock = threading.Lock()
@@ -22,7 +22,7 @@ class AGX:
 
         try:
             while True:
-                self._update_que()
+                #self._update_que()
                 self._process_virtual_vehicle_connections()
 
         except KeyboardInterrupt as e:
@@ -34,28 +34,19 @@ class AGX:
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.s.bind(self.ADDR)
-        self.s.listen()
+        self.s.listen(self.MAX_BUFFER_SIZE)
         print("[AGX] AGX started")
         print(f"[AGX] Listening on {self.AGX_IP} port {self.PORT}\n")
 
-    def _update_que(self):
-        if not self.BUFFER:
-            conn, addr = self.s.accept()
-            new_virtual_vehicle = (conn, addr)
-            self.BUFFER.append(new_virtual_vehicle)
-            print(f"[AGX] Added virtual vehicle to que: {addr[0]} port {addr[1]}")
-
     def _process_virtual_vehicle_connections(self):
-        if self.BUFFER and self.READY:
-            self.READY = False
-            self.CLIENT_ID += 1
-            print(f"[AGX] Processing virtual vehicle ID {self.CLIENT_ID}")
-            self.process_virtual_vehicle(self.BUFFER.pop(0))
+        conn, addr = self.s.accept()
+        new_virtual_vehicle = (conn, addr)
+        self.CLIENT_ID += 1
+        print(f"[AGX] Processing virtual vehicle ID {self.CLIENT_ID}")
+        self.process_virtual_vehicle(new_virtual_vehicle)
 
     def process_virtual_vehicle(self, connected_virtual_vehicle):
-        self.print_lock.acquire()
-        start_new_thread(self.agx_task, (connected_virtual_vehicle,))
-        self.print_lock.release()
+        self.agx_task(connected_virtual_vehicle)
 
     def agx_task(self, connected_virtual_vehicle):
         conn, _ = connected_virtual_vehicle
