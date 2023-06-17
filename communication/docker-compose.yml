@@ -6,9 +6,17 @@ services:
     command: python ./server.py
     ports:
       - 65432:65432
+  agx-scheduler:
+    build: scheduler/
+    command: python ./scheduler.py
+    ports:
+      - 59999:59999
   vv-client:
     build: client/
     command: python ./client.py
     network_mode: host
     depends_on:
       - az-server
+      - agx-scheduler
+    deploy:
+      replicas: 5

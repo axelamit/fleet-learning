@@ -5,9 +5,9 @@ import time
 class VirtualVehicle:
     def __init__(
         self,
-        server_ip="localhost",
+        server_ip="0.0.0.0",
         server_port=65432,
-        agx_ip="localhost",
+        agx_ip="0.0.0.0",
         agx_port=59999,
     ):
         self.SERVER_IP = server_ip

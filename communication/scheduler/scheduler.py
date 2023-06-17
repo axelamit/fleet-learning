@@ -5,7 +5,7 @@ import select
 
 
 class AGX:
-    def __init__(self, agx_ip="localhost", agx_port=59999):
+    def __init__(self, agx_ip="0.0.0.0", agx_port=59999):
         self.AGX_IP = agx_ip
         self.PORT = agx_port
         self.ADDR = (self.AGX_IP, self.PORT)
@@ -113,7 +113,7 @@ class AGX:
         return stop_session
 
     def _train(self):
-        time.sleep(10)
+        time.sleep(4)
 
 
 def main():

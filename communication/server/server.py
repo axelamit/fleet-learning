@@ -5,7 +5,7 @@ import time
 
 
 class AzureServer:
-    def __init__(self, server_ip="localhost", server_port=65432):
+    def __init__(self, server_ip="0.0.0.0", server_port=65432):
         self.SERVER_IP = server_ip
         self.PORT = server_port
         self.ADDR = (self.SERVER_IP, self.PORT)
