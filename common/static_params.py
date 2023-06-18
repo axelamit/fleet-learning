@@ -18,10 +18,10 @@ class PartitionStrategy(Enum):
 class GlobalConfigs:
     def __init__(self):
         self.SIMULATED = True
-        self.NUM_CPUS = 3 # how many processes to allow ray to start up
-        self.GB_RAM = 6 # how many GB ram per process
+        self.NUM_CPUS = 2 # how many processes to allow ray to start up
+        self.GB_RAM = 15 # how many GB ram per process
         self.FRACTION_FIT = 0.25 # percentage of total clients to use in a round
-        self.SERVER_MAIN_PATH = "/root/Fleet/fleet-learning/"
+        self.SERVER_MAIN_PATH = "~/fleet-learning/"
         self.VM_IP = '172.25.16.67'
         self.VM_KEY_PATH = '/home/nvidia/.ssh/id_rsa'
 
@@ -35,7 +35,7 @@ class GlobalConfigs:
                 }
 
         self.TARGET_DISTANCES = [5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 95, 110, 125, 145, 165]
-        self.NUM_CLIENTS = 20
+        self.NUM_CLIENTS = 2
         self.PERCENTAGE_OF_DATA = 0.02
         self.NUM_OUTPUT = 51
         self.IMG_SIZE = 256
@@ -43,8 +43,8 @@ class GlobalConfigs:
         self.BATCH_SIZE = 8
         self.VAL_FACTOR = 0.1 # percentage of train data to use for validation
         self.SUBSET_FACTOR = 0.003 # subset of test frames to use
-        self.USE_GPU = False
-        self.NUM_GLOBAL_ROUNDS = 3
+        self.USE_GPU = torch.cuda.is_available()#True
+        self.NUM_GLOBAL_ROUNDS = 10
         self.NUM_LOCAL_EPOCHS = 4
         self.PRINT_DEBUG_DATA = True
         self.ML_TASK = TASK.REGRESSION

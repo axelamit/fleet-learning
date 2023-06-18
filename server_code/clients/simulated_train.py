@@ -26,7 +26,7 @@ def train_simulated(parameters, cid):
     
     fleet_log(INFO,'train the model')
     
-    losses, accs, val_losses, val_accs = train(model, trainloader, valloader, global_configs.NUM_LOCAL_EPOCHS, plot = False,client_cid = cid)
+    losses, accs, val_losses, val_accs = train(model, trainloader, valloader, global_configs.NUM_LOCAL_EPOCHS, plot = True,client_cid = cid)
     
     fleet_log(INFO,f"loss: {losses}, accs: {accs}, val_losses: {val_losses}, val_accs: {val_accs}")
     

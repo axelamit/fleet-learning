@@ -21,6 +21,7 @@ def main(
         "include_dashboard": False,
         "object_store_memory": global_configs.GB_RAM * 1024 * 1024 * 1024/(global_configs.NUM_CLIENTS*1.2), # for some reason clients have to share 1 GB memory.. But its fine probably
         "num_cpus" : global_configs.NUM_CPUS,
+        "num_gpus": 1
     }
     ray.init(**ray_init_args)  # type: ignore
     fleet_log(

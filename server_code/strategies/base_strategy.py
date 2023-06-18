@@ -33,5 +33,5 @@ class BaseStrategy(FedAvg):
     ) -> Optional[fl.common.NDArrays]:
         parameters_aggregated, metrics_aggregated = super().aggregate_fit(server_round, results, failures)
         fleet_log(INFO,'Saving newest parameters')
-        np.savez("tmp/agg.npz", parameters_to_ndarrays(parameters_aggregated))
+        np.savez("tmp/agg.npz", np.array(parameters_to_ndarrays(parameters_aggregated), dtype=object))
         return parameters_aggregated, metrics_aggregated

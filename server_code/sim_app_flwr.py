@@ -18,6 +18,7 @@
 import sys
 from logging import ERROR, INFO
 from typing import Any, Callable, Dict, List, Optional
+import pickle
 
 import ray
 
@@ -180,5 +181,8 @@ def start_simulation(  # pylint: disable=too-many-arguments
     )
 
     event(EventType.START_SIMULATION_LEAVE)
+
+    with open("history.pkl", "wb") as f:
+        pickle.dump(hist, f)
 
     return hist

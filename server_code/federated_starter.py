@@ -16,7 +16,7 @@ class FederatedStarter:
     def __init__(self, testloader, nr_local_epochs=global_configs.NUM_LOCAL_EPOCHS, tb_path=None, federated_subpath=None):
         self.edge_handler = None
         self.testloader = testloader
-        self.client_resources = {"num_cpus" : 0.5}
+        self.client_resources = {"num_cpus" : 0.5, "num_gpus": 0.1}
         self.nr_local_epochs = nr_local_epochs
         self.tb_path = tb_path
         self.federated_subpath = federated_subpath
@@ -58,7 +58,7 @@ class FederatedStarter:
         server_model = net_instance(f"server")
         server_params = get_parameters(server_model)
         fleet_log(INFO,'Saving initial parameters for edge devices')
-        np.savez("tmp/agg.npz", server_params)
+        np.savez("tmp/agg.npz", np.array(server_params, dtype=object))
         strategy = BaseStrategy(
             fraction_fit=fraction_fit,
             fraction_evaluate=fraction_evaluate,
