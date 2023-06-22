@@ -31,6 +31,11 @@ from flwr.server.client_manager import ClientManager
 from flwr.server.history import History
 from flwr.server.strategy import Strategy
 from server_code.ray_client_proxy_flwr import RayClientProxy
+from datetime import datetime
+import os
+from common.static_params import GlobalConfigs
+import pytz
+import shutil
 
 INVALID_ARGUMENTS_START_SIMULATION = """
 INVALID ARGUMENTS ERROR
@@ -182,7 +187,19 @@ def start_simulation(  # pylint: disable=too-many-arguments
 
     event(EventType.START_SIMULATION_LEAVE)
 
-    with open("history.pkl", "wb") as f:
+    cet = pytz.timezone("Europe/Stockholm")
+    now = datetime.now(cet)
+    dt_string = now.strftime("%d-%m-%Y-%H:%M:%S")
+
+    os.mkdir(f"./results/{dt_string}")
+
+    with open(f"results/{dt_string}/history.pkl", "wb") as f:
         pickle.dump(hist, f)
+
+    global_configs = GlobalConfigs()
+    with open(f"results/{dt_string}/global_configs.pkl", "wb") as f:
+        pickle.dump(global_configs, f)
+    
+    shutil.copyfile("tmp/agg.npz", f"results/{dt_string}/agg.npz")
 
     return hist

@@ -13,6 +13,16 @@ from zod.utils.geometry import get_points_in_camera_fov, project_3d_to_2d_kannal
 import cv2
 from common.logger import fleet_log
 from logging import INFO
+import glob
+from common.models import Net
+import torch
+from flwr.common import (
+    FitRes,
+    ndarrays_to_parameters,
+    parameters_to_ndarrays,
+)
+from common.utilities import train, net_instance, get_parameters, set_parameters
+
 
 def get_ground_truth(zod_frames, frame_id):
     # get frame
@@ -59,14 +69,37 @@ def transform_pred(zod_frames, frame_id, pred):
     pred = reshape_ground_truth(pred)
     return np.linalg.pinv(current_pose) @ pred
 
+def rescale_points(points):
+    for i in range(len(points)):
+        points[i][0] = points[i][0] * 256/3848
+        points[i][1] = points[i][1] * 256/2168
+
+def get_frame(frame_id, original=True):
+    if (original):
+        print("Checking path:", f"/mnt/ZOD/single_frames/{frame_id}/camera_front_dnat/*original.jpg")
+        image_path = glob.glob(f"/mnt/ZOD/single_frames/{frame_id}/camera_front_dnat/*original.jpg")[0]
+    else:
+        print("Checking path:", f"/mnt/ZOD/single_frames/{frame_id}/camera_front_dnat/*.jpg")
+        image_path = glob.glob(f"/mnt/ZOD/single_frames/{frame_id}/camera_front_dnat/*.jpg")[0]
+        image_path = image_path.replace("_original", "")
+    print("Image path:", image_path)
+    image = cv2.imread(image_path, )
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    print(image.shape)
+    return image
 
 def visualize_HP_on_image(zod_frames, frame_id, preds=None):
     """Visualize oxts track on image plane."""
     camera=Camera.FRONT
     zod_frame = zod_frames[frame_id]
-    image = zod_frame.get_image(Anonymization.DNAT)
+    #image = zod_frame.get_image(Anonymization.DNAT)
+
+    image = get_frame(frame_id)
+
     calibs = zod_frame.calibration
     points = get_ground_truth(zod_frames, frame_id)
+    print("Ground truth:", points)
+    print("MSE:", (np.square(points - preds)).mean())
     points = reshape_ground_truth(points)
     
     # transform point to camera coordinate system
@@ -80,46 +113,54 @@ def visualize_HP_on_image(zod_frames, frame_id, preds=None):
 
     # project points to image plane
     xy_array = project_3d_to_2d_kannala(
-        points_in_fov,
+        points_in_fov[0],
         calibs.cameras[camera].intrinsics[..., :3],
         calibs.cameras[camera].distortion,
     )
-    
+
+    #rescale_points(xy_array)
+
     points = []
     for i in range(xy_array.shape[0]):
         x, y = int(xy_array[i, 0]), int(xy_array[i, 1])
-        cv2.circle(image, (x,y), 2, (255, 0, 0), -1)
         points.append([x,y])
-    
+
     """Draw a line in image."""
     def draw_line(image, line, color):
-        return cv2.polylines(image.copy(), [np.round(line).astype(np.int32)], isClosed=False, color=color, thickness=10)
+        return cv2.polylines(image.copy(), [np.round(line).astype(np.int32)], isClosed=False, color=color, thickness=3)
     
     ground_truth_color = (19, 80, 41)
     preds_color = (161, 65, 137)
     image = draw_line(image, points, ground_truth_color)
+
+    for p in points:
+        cv2.circle(image, (p[0],p[1]), 4, (255, 0, 0), -1)
     
     # transform and draw predictions 
-    if(preds):
+    if(preds is not None):
         preds = reshape_ground_truth(preds)
         fleet_log(INFO,f"Number of pred points on image: {preds.shape[0]}")
         predpoints = transform_points(preds[:, :3], T_inv)
         predpoints_in_fov = get_points_in_camera_fov(calibs.cameras[camera].field_of_view, predpoints)
         xy_array_preds = project_3d_to_2d_kannala(
-            predpoints_in_fov,
+            predpoints_in_fov[0],
             calibs.cameras[camera].intrinsics[..., :3],
             calibs.cameras[camera].distortion,
         )
+
+        #rescale_points(xy_array_preds)
+        print(xy_array_preds)
+
         preds = []
         for i in range(xy_array_preds.shape[0]):
             x, y = int(xy_array_preds[i, 0]), int(xy_array_preds[i, 1])
-            cv2.circle(image, (x,y), 2, (255, 0, 0), -1)
+            cv2.circle(image, (x,y), 4, (255, 0, 0), -1)
             preds.append([x,y])
         image = draw_line(image, preds, preds_color)
         
     plt.clf()
     plt.axis("off")
-    plt.imsave(f'inference_{frame_id}.png', image)
+    plt.imsave(f'holistic_path_results/inference_{frame_id}.png', image)
     #plt.imshow(image)
 
 def flatten_ground_truth(label):
@@ -171,4 +212,29 @@ def main():
     create_ground_truth(zod_frames, training_frames_all, validation_frames_all, global_configs.STORED_GROUND_TRUTH_PATH)
 
 if __name__ == "__main__":
-    main()
+    #main()
+    idx = "042010" #"000001"
+
+    zod_frames = ZodFrames(dataset_root=global_configs.DATASET_ROOT, version='full')
+    training_frames_all = zod_frames.get_split(constants.TRAIN)
+    validation_frames_all = zod_frames.get_split(constants.VAL)
+
+
+
+    params = np.load("tmp/agg.npz", allow_pickle=True)
+    model = Net()
+    set_parameters(model, params['arr_0'])
+
+    image = get_frame(idx, original=False).reshape(1,3,256,256) #Check this (maybe not ok to reshape like this)
+    plt.imsave("holistic_path_results/org.png", image)
+    
+    zod_frame = zod_frames[idx]
+    image = torch.from_numpy(zod_frame.get_image(Anonymization.DNAT)).reshape(1,3,256,256).float()
+    #image = torch.from_numpy(image).float()
+
+    pred = model(image)
+    pred = pred.detach().numpy()
+
+    print(pred)
+
+    image = visualize_HP_on_image(zod_frames, idx, preds=pred)
