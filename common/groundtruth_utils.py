@@ -129,8 +129,7 @@ def reshape_ground_truth(label, output_size=global_configs.NUM_OUTPUT):
     return label.reshape(((global_configs.NUM_OUTPUT//3),3))
 
 def create_ground_truth(zod_frames, training_frames, validation_frames, path):
-    all_frames = validation_frames.copy()
-    all_frames.extend(training_frames)
+    all_frames = validation_frames.copy().union(training_frames.copy())
     
     corrupted_frames = []
     ground_truth = {}
