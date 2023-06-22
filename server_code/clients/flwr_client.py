@@ -19,7 +19,7 @@ class FlowerClient(fl.client.NumPyClient):
 
     def fit(self, parameters, config):
         if global_configs.SIMULATED:
-            params = train_simulated(parameters, self.cid)
+            params = train_simulated(parameters, self.cid, config)
         else:
             fleet_log(INFO,'Starting edge devie training process for cid: {self.cid}')
             params = self.edge_com.update_model(self.cid)

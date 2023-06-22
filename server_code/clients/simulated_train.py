@@ -6,7 +6,7 @@ from common.logger import fleet_log
 from logging import INFO
 
 
-def train_simulated(parameters, cid):
+def train_simulated(parameters, cid, config):
     # Get the command-line arguments
 
     fleet_log(INFO,'Simulated FL training starting')
@@ -16,7 +16,10 @@ def train_simulated(parameters, cid):
 
     fleet_log(INFO,f"load the data partition for client cid {cid}")
     
+    server_round = config["server_round"]
     partition = np.load("tmp/partitions.npz")[cid]
+    n_data = len(partition)//global_configs.NUM_GLOBAL_ROUNDS
+    partition = partition[n_data*(server_round-1):n_data*server_round]
     
     fleet_log(INFO,'data partition loaded')
     
