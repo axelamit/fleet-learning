@@ -61,8 +61,8 @@ class FederatedStarter:
         np.savez("tmp/agg.npz", np.array(server_params, dtype=object))
         strategy = BaseStrategy(
             fraction_fit=fraction_fit,
-            fraction_evaluate=fraction_evaluate,
-            min_evaluate_clients=min_evaluate_clients,
+            fraction_evaluate=0.0,
+            min_evaluate_clients=0.0,
             min_available_clients=min_available_clients,
             initial_parameters=fl.common.ndarrays_to_parameters(server_params),
             evaluate_fn=self.evaluate,
