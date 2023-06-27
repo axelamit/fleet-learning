@@ -140,3 +140,6 @@ output.log
 holistic_path_results
 
 results
+balanced_data/train_*.txt
+balanced_data/val_*.txt
+tmp/*.npz

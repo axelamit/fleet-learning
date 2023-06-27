@@ -213,15 +213,15 @@ def main():
 
 if __name__ == "__main__":
     #main()
-    idx = "042010" #"000001"
+    idx = "032010" #"000001"
 
     zod_frames = ZodFrames(dataset_root=global_configs.DATASET_ROOT, version='full')
     training_frames_all = zod_frames.get_split(constants.TRAIN)
     validation_frames_all = zod_frames.get_split(constants.VAL)
 
 
-
-    params = np.load("tmp/agg.npz", allow_pickle=True)
+    date = "27-06-2023-12:39:30" #"27-06-2023-11:38:51"
+    params = np.load(f"results/{date}/agg.npz", allow_pickle=True)
     model = Net()
     set_parameters(model, params['arr_0'])
 

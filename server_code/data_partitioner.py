@@ -9,17 +9,26 @@ from common.static_params import global_configs
 from common.groundtruth_utils import load_ground_truth
 from common.logger import fleet_log
 from logging import INFO
+from pathlib import Path
 # Data partition will be saved as a dictionary client_cid -> [frames_id's] and this dict is 
 # downloaded by the client that loads the correct elements by the idx list in the dictionary
 
 # random.seed(2023)
 
+def filename_to_arr(filename):
+    with open(Path("./balanced_data", filename), "r") as file:
+        return file.read().splitlines()
+
 #load data based on cid and strategy
 def partition_train_data(strat: PartitionStrategy, no_clients: int):
     version = "full"  # "mini" or "full"
-    zod_frames = ZodFrames(dataset_root="/mnt/ZOD", version=version)
-    training_frames_all = zod_frames.get_split(constants.TRAIN)
-    validation_frames_all = zod_frames.get_split(constants.VAL)
+    #zod_frames = ZodFrames(dataset_root="/mnt/ZOD", version=version)
+
+    training_frames_all = filename_to_arr("balanced_train_ids.txt")
+    validation_frames_all = filename_to_arr("balanced_val_ids.txt")
+
+    # training_frames_all = zod_frames.get_split(constants.TRAIN)
+    # validation_frames_all = zod_frames.get_split(constants.VAL)
     
     ground_truth = load_ground_truth(global_configs.STORED_GROUND_TRUTH_PATH)
     fleet_log(INFO,'loaded stored ground truth')
